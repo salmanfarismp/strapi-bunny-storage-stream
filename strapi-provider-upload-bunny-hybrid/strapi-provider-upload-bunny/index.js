@@ -1,5 +1,8 @@
 // Bunny.net upload provider for Strapi v5
 // Exposes upload, uploadStream, and delete methods
+/**
+ * Object Storage provider targeting Bunny.net Storage API.
+ */
 
 function normalizePath(...parts) {
   const joined = parts
@@ -8,7 +11,7 @@ function normalizePath(...parts) {
     .join("/");
   return joined
     .replace(/\\/g, "/")
-    .replace(/\/+/, "/")
+    .replace(/\/+/g, "/")
     .replace(/(^\/)|(\/$)/g, "");
 }
 
@@ -42,7 +45,9 @@ module.exports = {
     }
 
     async function putToBunny(objectPath, body, contentType) {
-      const url = `https://${storageHost}/${encodeURIComponent(storageZone)}/${objectPath}`;
+      const url = `https://${storageHost}/${encodeURIComponent(
+        storageZone
+      )}/${objectPath}`;
       const response = await fetch(url, {
         method: "PUT",
         headers: {
@@ -60,7 +65,9 @@ module.exports = {
     }
 
     async function deleteFromBunny(objectPath) {
-      const url = `https://${storageHost}/${encodeURIComponent(storageZone)}/${objectPath}`;
+      const url = `https://${storageHost}/${encodeURIComponent(
+        storageZone
+      )}/${objectPath}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
@@ -83,7 +90,6 @@ module.exports = {
     return {
       async upload(file) {
         const objectPath = resolveObjectPath(file);
-        const content = file.buffer || file.stream;
         let buffer = file.buffer;
         if (!buffer && file.stream) {
           buffer = await bufferFromStream(file.stream);

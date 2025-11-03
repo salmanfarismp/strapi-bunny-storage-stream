@@ -1,9 +1,18 @@
 // Bunny.net Stream upload provider for Strapi v5
 // Handles ONLY video uploads via Bunny Stream API
+/**
+ * Bunny Stream provider for Strapi's upload plugin.
+ */
 
 function assertVideo(file) {
-  if (!file || typeof file.mime !== "string" || !file.mime.startsWith("video/")) {
-    throw new Error("Bunny Stream provider: only video/* mime types are supported");
+  if (
+    !file ||
+    typeof file.mime !== "string" ||
+    !file.mime.startsWith("video/")
+  ) {
+    throw new Error(
+      "Bunny Stream provider: only video/* mime types are supported"
+    );
   }
 }
 
@@ -16,7 +25,9 @@ async function bufferFromStream(readable) {
 }
 
 async function createVideo({ apiKey, libraryId, title, collectionId }) {
-  const url = `https://video.bunnycdn.com/library/${encodeURIComponent(libraryId)}/videos`;
+  const url = `https://video.bunnycdn.com/library/${encodeURIComponent(
+    libraryId
+  )}/videos`;
   const body = { title };
   if (collectionId) body.collectionId = collectionId;
   const res = await fetch(url, {
@@ -29,17 +40,22 @@ async function createVideo({ apiKey, libraryId, title, collectionId }) {
   });
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`Bunny Stream: create video failed: ${res.status} ${res.statusText} ${text}`);
+    throw new Error(
+      `Bunny Stream: create video failed: ${res.status} ${res.statusText} ${text}`
+    );
   }
   const json = await res.json();
   // Expect shape containing guid or videoId
   const videoId = json?.guid || json?.id || json?.videoId;
-  if (!videoId) throw new Error("Bunny Stream: could not resolve created video id");
+  if (!videoId)
+    throw new Error("Bunny Stream: could not resolve created video id");
   return { videoId };
 }
 
 async function uploadVideoBytes({ apiKey, libraryId, videoId, mime, bytes }) {
-  const url = `https://video.bunnycdn.com/library/${encodeURIComponent(libraryId)}/videos/${encodeURIComponent(videoId)}`;
+  const url = `https://video.bunnycdn.com/library/${encodeURIComponent(
+    libraryId
+  )}/videos/${encodeURIComponent(videoId)}`;
   const res = await fetch(url, {
     method: "PUT",
     headers: {
@@ -50,19 +66,25 @@ async function uploadVideoBytes({ apiKey, libraryId, videoId, mime, bytes }) {
   });
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`Bunny Stream: upload bytes failed: ${res.status} ${res.statusText} ${text}`);
+    throw new Error(
+      `Bunny Stream: upload bytes failed: ${res.status} ${res.statusText} ${text}`
+    );
   }
 }
 
 async function deleteVideo({ apiKey, libraryId, videoId }) {
-  const url = `https://video.bunnycdn.com/library/${encodeURIComponent(libraryId)}/videos/${encodeURIComponent(videoId)}`;
+  const url = `https://video.bunnycdn.com/library/${encodeURIComponent(
+    libraryId
+  )}/videos/${encodeURIComponent(videoId)}`;
   const res = await fetch(url, {
     method: "DELETE",
     headers: { AccessKey: apiKey },
   });
   if (!res.ok && res.status !== 404) {
     const text = await res.text().catch(() => "");
-    throw new Error(`Bunny Stream: delete failed: ${res.status} ${res.statusText} ${text}`);
+    throw new Error(
+      `Bunny Stream: delete failed: ${res.status} ${res.statusText} ${text}`
+    );
   }
 }
 
@@ -73,10 +95,13 @@ module.exports = {
     const apiKey = providerOptions.apiKey;
     const libraryId = providerOptions.libraryId;
     const collectionId = providerOptions.collectionId;
-    const embedBase = (providerOptions.embedBase || "https://iframe.mediadelivery.net").replace(/\/$/, "");
+    const embedBase = (
+      providerOptions.embedBase || "https://iframe.mediadelivery.net"
+    ).replace(/\/$/, "");
 
     if (!apiKey) throw new Error("Bunny Stream provider: apiKey is required");
-    if (!libraryId) throw new Error("Bunny Stream provider: libraryId is required");
+    if (!libraryId)
+      throw new Error("Bunny Stream provider: libraryId is required");
 
     function setPublicUrl(file, videoId) {
       // Embed URL format
@@ -92,11 +117,25 @@ module.exports = {
         if (!buffer && file.stream) {
           buffer = await bufferFromStream(file.stream);
         }
-        if (!buffer) throw new Error("Bunny Stream provider: file buffer/stream is required");
+        if (!buffer)
+          throw new Error(
+            "Bunny Stream provider: file buffer/stream is required"
+          );
 
         const title = file.name || `${file.hash}${file.ext}` || "video";
-        const { videoId } = await createVideo({ apiKey, libraryId, title, collectionId });
-        await uploadVideoBytes({ apiKey, libraryId, videoId, mime: file.mime, bytes: buffer });
+        const { videoId } = await createVideo({
+          apiKey,
+          libraryId,
+          title,
+          collectionId,
+        });
+        await uploadVideoBytes({
+          apiKey,
+          libraryId,
+          videoId,
+          mime: file.mime,
+          bytes: buffer,
+        });
         setPublicUrl(file, videoId);
       },
 
@@ -113,5 +152,3 @@ module.exports = {
     };
   },
 };
-
-

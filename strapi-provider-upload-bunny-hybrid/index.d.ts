@@ -1,6 +1,6 @@
 /// <reference types="node" />
-import type { Readable } from 'node:stream';
-import type { Buffer } from 'node:buffer';
+import type { Readable } from "node:stream";
+import type { Buffer } from "node:buffer";
 
 export interface HybridProviderOptions {
   streamEnabled?: boolean | string | number;
@@ -30,5 +30,6 @@ export interface StrapiUploadProviderAPI {
   delete(file: StrapiUploadFile): Promise<void>;
 }
 
-export function init(config?: { providerOptions?: HybridProviderOptions } | HybridProviderOptions): StrapiUploadProviderAPI;
-
+export function init(
+  config?: { providerOptions?: HybridProviderOptions } | HybridProviderOptions
+): StrapiUploadProviderAPI;
