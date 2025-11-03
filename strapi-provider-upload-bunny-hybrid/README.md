@@ -18,25 +18,33 @@ In `config/plugins.ts` (or `config/plugins.js`):
 export default () => ({
   upload: {
     config: {
-      provider: 'strapi-plugin-bunny-storage-stream',
+      provider: "strapi-plugin-bunny-storage-stream",
       providerOptions: {
         // Enable routing videos to Bunny Stream
-        streamEnabled: process.env.BUNNY_STREAM_ENABLED === 'true',
+        streamEnabled: env("BUNNY_STREAM_ENABLED", "false") === "true",
 
         // Child provider options
+        // Storage (Object Storage) options
         storage: {
-          // Bunny Object Storage credentials/options
-          // e.g. storageZone, region, accessKey, publicUrl, etc.
+          storageZone: env("BUNNY_STORAGE_ZONE", "your-storage-name"),
+          accessKey: env(
+            "BUNNY_ACCESS_KEY",
+            "abcd1234-abcd-1234-123456789abc-1234-1234"
+          ),
+          storageHost: env("BUNNY_STORAGE_HOST", "storage.bunnycdn.com"),
+          baseDir: env("BUNNY_BASE_DIR", ""), // eg. local, strapi // to arrage them better
+          cdnBaseUrl: env("BUNNY_CDN_BASE_URL", "plzn.b-cdn.net"),
         },
+        // Stream options (only used when streamEnabled=true)
         stream: {
-          // Bunny Stream credentials/options
-          // e.g. libraryId, apiKey, cdnBaseUrl, etc.
+          libraryId: env("BUNNY_STREAM_LIBRARY_ID", "123456"),
+          apiKey: env(
+            "BUNNY_STREAM_API_KEY",
+            "thisisad-iffe-rent-keyabo123456-1234-1234"
+          ),
+          collectionId: env("BUNNY_STREAM_COLLECTION_ID"), // optional
+          embedBase: env("BUNNY_STREAM_EMBED_BASE"), // CDN Hostname
         },
-
-        // Optional: override where child providers resolve from
-        // Defaults assume colocated providers within your app's `providers/` directory
-        // storageProviderPath: path.resolve(process.cwd(), 'providers', 'strapi-provider-upload-bunny'),
-        // streamProviderPath: path.resolve(process.cwd(), 'providers', 'strapi-provider-upload-bunny-stream'),
       },
     },
   },
@@ -44,20 +52,10 @@ export default () => ({
 ```
 
 Notes:
+
 - `streamEnabled` controls whether videos are handled by Bunny Stream. When `false`, all uploads go to Object Storage.
 - The hybrid provider uses simple MIME detection (`video/*`) to decide routing for uploads; deletions prefer Stream when a `provider_metadata.videoId` is present.
 - If you bundle the child providers within this package in your app, ensure their paths resolve (default paths use `process.cwd()/providers/...`).
-
-## Environment variables (example)
-
-```env
-BUNNY_STREAM_ENABLED=true
-BUNNY_STORAGE_ZONE=your-zone
-BUNNY_STORAGE_ACCESS_KEY=your-access-key
-BUNNY_STORAGE_REGION=de
-BUNNY_STREAM_LIBRARY_ID=12345
-BUNNY_STREAM_API_KEY=your-stream-api-key
-```
 
 ## Exports / Entry
 
@@ -69,4 +67,3 @@ BUNNY_STREAM_API_KEY=your-stream-api-key
 ## License
 
 MIT
-
