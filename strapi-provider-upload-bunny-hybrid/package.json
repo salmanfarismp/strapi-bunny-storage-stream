@@ -1,0 +1,43 @@
+{
+  "name": "strapi-plugin-bunny-storage-stream",
+  "version": "1.0.0",
+  "description": "Hybrid Strapi v5 upload provider for Bunny.net Object Storage and Bunny Stream (no code changes)",
+  "license": "MIT",
+  "type": "commonjs",
+  "main": "index.js",
+  "exports": "./index.js",
+  "files": [
+    "index.js",
+    "strapi-provider-upload-bunny/**",
+    "strapi-provider-upload-bunny-stream/**"
+  ],
+  "keywords": [
+    "strapi",
+    "strapi-provider",
+    "upload",
+    "bunny",
+    "bunny.net",
+    "stream",
+    "video",
+    "strapi v5"
+  ],
+  "peerDependencies": {
+    "@strapi/strapi": "^5",
+    "@strapi/plugin-upload": "^5"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your/repo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your/repo/issues"
+  },
+  "homepage": "https://github.com/your/repo#readme",
+  "publishConfig": {
+    "access": "public"
+  }
+}
+
